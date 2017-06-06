@@ -71,7 +71,6 @@ You can set the following properties.
 | `entered`             | `PropTypes.func`                                            | `fadeUp.appear`                  | ...                                                                                                                                     |
 | `leaved`              | `PropTypes.func`                                            | `fadeUp.appear`                  | ...                                                                                                                                     |
 | `units`               | `PropTypes.func`                                            | `{ length: "px", angle: "deg" }` | ...                                                                                                                                     |
-| `monitorImagesLoaded` | `PropTypes.bool`                                            | `false`                          | If set to `true`, images reading is monitored. use [imagesloaded](https://github.com/desandro/imagesloaded).                            |
 | `vendorPrefix`        | `PropTypes.bool`                                            | `false`                          | If set to `true`, add a vendor prefix to styles add dynamically.                                                                        |
 | `userAgent`           | `PropTypes.string`                                          | `undefined`                      | Specify userAgent for determinig the vendor prefix. See [inline-style-prefixer](https://github.com/rofrischmann/inline-style-prefixer). |
 | `enableSSR`           | `PropTypes.bool`                                            | `false`                          | Render component on the server side. [More info](https://github.com/ctrlplusb/react-sizeme#server-side-rendering).                      |
@@ -141,11 +140,27 @@ Please try actual demonstration in [live demo](https://tsuyoshiwada.github.io/re
 
 ## Tips
 
-
 ### Performance when using images
 
-When `true` is specified for `monitorImagesLoaded`, reloading occurs when the image loading is completed.  
-If you know the size in advance, specify `monitorImagesLoaded` as `false`.
+StackGrid will work without explicitly specifying image size.  
+However, the adjustment of the layout will continue until the size of the grid is finalized.  
+It looks very bad.
+
+If you know the image size in advance, it is desirable to specify the size explicitly.
+
+Using the following code, you can easily achieve a responsive grid.
+
+```javascript
+<StackGrid>
+  <div style={{
+    width: '100%',
+    height: '0',
+    paddingBottom: '62.5%', // actual size (320x200 = (height / width) * 100 = 62.5)
+  }}>
+    {/* Contents... */}
+  </div>
+</StackGrid>
+```
 
 
 ### When animation is unnecessary

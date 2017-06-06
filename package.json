@@ -91,7 +91,6 @@
   "dependencies": {
     "easy-css-transform-builder": "^0.0.2",
     "exenv": "^1.2.1",
-    "imagesloaded": "^4.1.1",
     "inline-style-prefixer": "^2.0.4",
     "invariant": "^2.2.2",
     "prop-types": "^15.5.10",

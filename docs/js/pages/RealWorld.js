@@ -34,7 +34,6 @@ export default class RealWorld extends Component {
   render() {
     return (
       <StackGrid
-        monitorImagesLoaded
         columnWidth={300}
         duration={600}
         gutterWidth={15}

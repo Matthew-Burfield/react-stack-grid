@@ -12,13 +12,10 @@ import isNumber from '../utils/isNumber';
 import isPercentageNumber from '../utils/isPercentageNumber';
 import createArray from '../utils/createArray';
 import transition from '../utils/transition';
-import { raf } from '../animations/request-animation-frame';
 import * as easings from '../animations/easings';
 import * as transitions from '../animations/transitions/';
 
 import type { Units } from '../types/';
-
-const imagesLoaded = ExecutionEnvironment.canUseDOM ? require('imagesloaded') : null;
 
 
 /* eslint-disable consistent-return */
@@ -68,7 +65,6 @@ type Props = {
   entered: Function;
   leaved: Function;
   units: Units;
-  monitorImagesLoaded: boolean;
   vendorPrefix: boolean;
   userAgent: ?string;
   enableSSR: boolean;
@@ -119,7 +115,6 @@ const propTypes = {
     length: PropTypes.string,
     angle: PropTypes.string,
   }),
-  monitorImagesLoaded: PropTypes.bool,
   vendorPrefix: PropTypes.bool,
   userAgent: PropTypes.string,
   enableSSR: PropTypes.bool,
@@ -259,18 +254,6 @@ export class GridInline extends Component<InlineDefaultProps, InlineProps, Inlin
   handleItemMounted = (item: GridItem) => {
     const { itemKey: key } = item.props;
     this.items[key] = item;
-
-    if (this.props.monitorImagesLoaded && typeof imagesLoaded === 'function') {
-      const node = ReactDOM.findDOMNode(item);
-      const imgLoad = imagesLoaded(node);
-
-      imgLoad.once('always', () => raf(() => {
-        this.updateLayout(this.props);
-      }));
-
-      this.imgLoad[key] = imgLoad;
-    }
-
     this.updateLayout(this.props);
   }
 
@@ -293,7 +276,6 @@ export class GridInline extends Component<InlineDefaultProps, InlineProps, Inlin
       gutterWidth,
       gutterHeight,
       columnWidth: rawColumnWidth,
-      monitorImagesLoaded,
       enableSSR,
       /* eslint-enable no-unused-vars */
       className,
@@ -381,7 +363,6 @@ StackGrid.defaultProps = {
   entered: transitions.fadeUp.entered,
   leaved: transitions.fadeUp.leaved,
   units: { length: 'px', angle: 'deg' },
-  monitorImagesLoaded: false,
   vendorPrefix: true,
   userAgent: null,
   enableSSR: false,
