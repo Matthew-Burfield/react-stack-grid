@@ -252,6 +252,10 @@ export class GridInline extends Component<InlineDefaultProps, InlineProps, Inlin
     this.setStateIfNeeded(this.doLayout(props));
   }
 
+  handleItemResize = () => {
+    this.updateLayout(this.props);
+  };
+
   handleItemMounted = (item: GridItem) => {
     const { itemKey: key } = item.props;
     this.items[key] = item;
@@ -331,6 +335,7 @@ export class GridInline extends Component<InlineDefaultProps, InlineProps, Inlin
             itemKey={child.key}
             rect={rects[i]}
             containerSize={containerSize}
+            onResize={this.handleItemResize}
             onMounted={this.handleItemMounted}
             onUnmount={this.handleItemUnmount}
           >

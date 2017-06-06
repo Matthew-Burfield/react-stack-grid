@@ -1,12 +1,29 @@
 // @flow
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
+import sizeMe from 'react-sizeme';
 import shallowequal from 'shallowequal';
 import transition from '../utils/transition';
 import buildStyles from '../utils/buildStyles';
 import { raf } from '../animations/request-animation-frame';
 
 import type { Units, Rect } from '../types/';
+
+
+type ResizeDetectorProps = {
+  ref: Function;
+  style: { [key: string]: any };
+  onSize: Function;
+  [key: string]: any;
+};
+
+const ResizeDetector = sizeMe({
+  monitorWidth: false,
+  monitorHeight: true,
+})((props: ResizeDetectorProps) => (
+  <span {...props} />
+));
+
 
 type Props = {
   itemKey: string;
@@ -29,10 +46,13 @@ type Props = {
   vendorPrefix: boolean;
   userAgent: ?string;
   onMounted: Function;
+  onResize: Function;
   onUnmount: Function;
 };
 
 type State = Object;
+
+type DefaultProps = Object;
 
 const getTransitionStyles = (type: string, props: Props): Object => {
   const { rect, containerSize, index } = props;
@@ -47,12 +67,15 @@ const getPositionStyles = (rect: Rect, zIndex: number): Object => ({
 });
 
 
-export default class GridItem extends Component {
+export default class GridItem extends Component<DefaultProps, Props, State> {
+  static defaultProps: DefaultProps;
+
   props: Props;
   state: State;
-  node: ?HTMLElement;
-  mounted: boolean;
-  appearTimer: ?number;
+  node: ?HTMLElement = null;
+  height: number = 0;
+  mounted: boolean = false;
+  appearTimer: ?number = null;
 
   static propTypes = {
     itemKey: PropTypes.string,
@@ -83,15 +106,12 @@ export default class GridItem extends Component {
     vendorPrefix: PropTypes.bool,
     userAgent: PropTypes.string,
     onMounted: PropTypes.func,
+    onResize: PropTypes.func,
     onUnmount: PropTypes.func,
   };
 
   constructor(props: Props) {
     super(props);
-
-    this.mounted = false;
-    this.appearTimer = null;
-    this.node = null;
 
     this.state = {
       ...getPositionStyles(props.rect, 1),
@@ -189,6 +209,15 @@ export default class GridItem extends Component {
     });
   }
 
+  handleResize = (to: { width: ?number; height: number; position: ?any }) => {
+    if (this.height === 0) {
+      this.height = to.height;
+    } else if (this.height !== to.height) {
+      this.height = to.height;
+      this.props.onResize(this);
+    }
+  };
+
   render() {
     const {
       /* eslint-disable no-unused-vars */
@@ -200,6 +229,7 @@ export default class GridItem extends Component {
       enter,
       entered,
       leaved,
+      onResize,
       onMounted,
       onUnmount,
       itemKey,
@@ -225,10 +255,11 @@ export default class GridItem extends Component {
 
     /* eslint-disable no-return-assign */
     return (
-      <span
+      <ResizeDetector
         {...rest}
         ref={node => this.node = node}
         style={style}
+        onSize={this.handleResize}
       />
     );
     /* eslint-enable no-return-assign */
