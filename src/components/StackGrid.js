@@ -8,7 +8,10 @@ import shallowequal from 'shallowequal';
 import ExecutionEnvironment from 'exenv';
 import invariant from 'invariant';
 import GridItem from './GridItem';
-import { transition } from '../utils/style-helper';
+import isNumber from '../utils/isNumber';
+import isPercentageNumber from '../utils/isPercentageNumber';
+import createArray from '../utils/createArray';
+import transition from '../utils/transition';
 import { raf } from '../animations/request-animation-frame';
 import * as easings from '../animations/easings';
 import * as transitions from '../animations/transitions/';
@@ -17,16 +20,6 @@ import type { Units } from '../types/';
 
 const imagesLoaded = ExecutionEnvironment.canUseDOM ? require('imagesloaded') : null;
 
-
-const isNumber = (v: any): boolean => typeof v === 'number' && isFinite(v);
-const isPercentageNumber = (v: any): boolean => typeof v === 'string' && /^\d+(\.\d+)?%$/.test(v);
-
-// eslint-disable-next-line arrow-parens
-const createArray = <T>(v: T, l: number): T[] => {
-  const array = [];
-  for (let i = 0; i < l; i += 1) array.push(v);
-  return array;
-};
 
 /* eslint-disable consistent-return */
 const getColumnLengthAndWidth = (
@@ -57,6 +50,7 @@ const getColumnLengthAndWidth = (
 /* eslint-enable consistent-return */
 
 
+/* eslint-disable react/no-unused-prop-types */
 type Props = {
   children: React$Element<any>;
   className?: string;
@@ -92,12 +86,14 @@ type InlineState = {
   columnWidth: number;
 };
 
-type InlineProps = $All<Props, {
+type InlineProps = Props & {
   size: {
     width: number;
     height: number;
   }
-}>;
+};
+
+type InlineDefaultProps = InlineProps;
 
 /* eslint-disable react/no-unused-prop-types */
 const propTypes = {
@@ -130,12 +126,8 @@ const propTypes = {
 };
 /* eslint-enable react/no-unused-prop-types */
 
-export class GridInline extends Component {
-  props: InlineProps;
-  state: InlineState;
-  items: { [key: string]: GridItem; };
-  imgLoad: Object;
-  mounted: boolean;
+export class GridInline extends Component<InlineDefaultProps, InlineProps, InlineState> {
+  static defaultProps: InlineDefaultProps;
 
   static propTypes = {
     ...propTypes,
@@ -144,6 +136,12 @@ export class GridInline extends Component {
       height: PropTypes.number,
     }),
   };
+
+  props: InlineProps;
+  state: InlineState;
+  items: { [key: string]: GridItem; };
+  imgLoad: Object;
+  mounted: boolean;
 
   constructor(props: InlineProps) {
     super(props);
@@ -351,34 +349,37 @@ const SizeAwareGridInline = sizeMe({
 })(GridInline);
 
 
-export default class StackGrid extends Component {
-  props: Props;
+const StackGrid = (props: Props) => {
+  sizeMe.enableSSRBehaviour = props.enableSSR;
 
-  static propTypes = propTypes;
+  return (
+    <SizeAwareGridInline
+      {...props}
+    />
+  );
+};
 
-  static defaultProps = {
-    style: {},
-    component: 'div',
-    columnWidth: 150,
-    gutterWidth: 5,
-    gutterHeight: 5,
-    duration: 480,
-    easing: easings.quartOut,
-    appearDelay: 30,
-    appear: transitions.fadeUp.appear,
-    appeared: transitions.fadeUp.appeared,
-    enter: transitions.fadeUp.enter,
-    entered: transitions.fadeUp.entered,
-    leaved: transitions.fadeUp.leaved,
-    units: { length: 'px', angle: 'deg' },
-    monitorImagesLoaded: false,
-    vendorPrefix: true,
-    userAgent: null,
-    enableSSR: false,
-  };
+StackGrid.propTypes = propTypes;
 
-  render() {
-    sizeMe.enableSSRBehaviour = this.props.enableSSR;
-    return <SizeAwareGridInline {...this.props} />;
-  }
-}
+StackGrid.defaultProps = {
+  style: {},
+  component: 'div',
+  columnWidth: 150,
+  gutterWidth: 5,
+  gutterHeight: 5,
+  duration: 480,
+  easing: easings.quartOut,
+  appearDelay: 30,
+  appear: transitions.fadeUp.appear,
+  appeared: transitions.fadeUp.appeared,
+  enter: transitions.fadeUp.enter,
+  entered: transitions.fadeUp.entered,
+  leaved: transitions.fadeUp.leaved,
+  units: { length: 'px', angle: 'deg' },
+  monitorImagesLoaded: false,
+  vendorPrefix: true,
+  userAgent: null,
+  enableSSR: false,
+};
+
+export default StackGrid;

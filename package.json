@@ -14,7 +14,7 @@
     "test": "npm-run-all test:*",
     "test:lint": "eslint \"src/**/*.js\" \"test/**/*.js\"",
     "test:typecheck": "flow",
-    "test:unit": "NODE_ENV=development mocha test/**/*.spec.js --compilers js:babel-register --recursive --require test/.setup.js",
+    "test:unit": "NODE_ENV=development mocha \"test/**/*.spec.js\" --compilers js:babel-register --recursive --require test/.setup.js",
     "docs": "browserify -e docs/js/entry.js -o docs/js/bundle.js",
     "docs:watch": "npm-run-all --parallel docs:watch:*",
     "docs:watch:js": "watchify -e docs/js/entry.js -o docs/js/bundle.js -d -v & watch '$(npm bin)/browser-sync reload' docs/js/",

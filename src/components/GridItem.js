@@ -2,7 +2,8 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import shallowequal from 'shallowequal';
-import { transition, buildStyles } from '../utils/style-helper';
+import transition from '../utils/transition';
+import buildStyles from '../utils/buildStyles';
 import { raf } from '../animations/request-animation-frame';
 
 import type { Units, Rect } from '../types/';

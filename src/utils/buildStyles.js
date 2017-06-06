@@ -10,14 +10,7 @@ export type Units = {
 
 const isTransformProp = v => properties.indexOf(v) > -1;
 
-export const transition = (props: Array<string>, duration: number, easing: string) => (
-  props.map(prop =>
-    `${prop} ${duration}ms ${easing}`
-  ).join(',')
-);
-
-
-export const buildStyles = (
+const buildStyles = (
   styles: Object,
   units: Units,
   vendorPrefix: boolean,
@@ -53,3 +46,5 @@ export const buildStyles = (
 
   return finalStyles;
 };
+
+export default buildStyles;
