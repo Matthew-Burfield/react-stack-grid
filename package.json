@@ -89,9 +89,10 @@
     "react-dom": ">=15.3.0"
   },
   "dependencies": {
+    "deep-equal": "^1.0.1",
     "easy-css-transform-builder": "^0.0.2",
     "exenv": "^1.2.1",
-    "inline-style-prefixer": "^2.0.4",
+    "inline-style-prefixer": "^3.0.5",
     "invariant": "^2.2.2",
     "prop-types": "^15.5.10",
     "react-sizeme": "^2.2.0",

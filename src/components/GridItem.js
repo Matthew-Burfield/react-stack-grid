@@ -150,10 +150,13 @@ export default class GridItem extends Component<DefaultProps, Props, State> {
   }
 
   componentWillAppear(callback: Function) {
+    // console.log('Appear', this.props.index);
+
     this.appearTimer = setTimeout(callback, this.props.appearDelay * this.props.index);
   }
 
   componentDidAppear() {
+    // console.log('Did Appear', this.props.index);
     this.setAppearedStyles();
   }
 

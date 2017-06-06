@@ -1,6 +1,5 @@
 // @flow
 import React, { Component, isValidElement } from 'react';
-import ReactDOM from 'react-dom';
 import PropTypes from 'prop-types';
 import TransitionGroup from 'react-transition-group/TransitionGroup';
 import sizeMe from 'react-sizeme';
@@ -12,6 +11,7 @@ import isNumber from '../utils/isNumber';
 import isPercentageNumber from '../utils/isPercentageNumber';
 import createArray from '../utils/createArray';
 import transition from '../utils/transition';
+import { raf } from '../animations/request-animation-frame';
 import * as easings from '../animations/easings';
 import * as transitions from '../animations/transitions/';
 
@@ -135,14 +135,14 @@ export class GridInline extends Component<InlineDefaultProps, InlineProps, Inlin
   props: InlineProps;
   state: InlineState;
   items: { [key: string]: GridItem; };
-  imgLoad: Object;
   mounted: boolean;
+  pendingUpdateProps: ?InlineProps;
+  requestedFrame: ?number;
 
   constructor(props: InlineProps) {
     super(props);
 
     this.items = {};
-    this.imgLoad = {};
     this.mounted = false;
     this.state = this.doLayout(props);
   }
@@ -177,16 +177,13 @@ export class GridInline extends Component<InlineDefaultProps, InlineProps, Inlin
 
   getItemHeight(item: any): number {
     if (item.key && this.items.hasOwnProperty(item.key)) {
-      const component = this.items[item.key];
-      const el = (ReactDOM.findDOMNode(component): any);
-      const candidate = [el.scrollHeight, el.clientHeight, el.offsetHeight, 0].filter(isNumber);
+      const component: GridItem = this.items[item.key];
 
-      return Math.max(...candidate);
+      return Math.max(...[Math.round(component.height), 0].filter(isNumber));
     }
 
     return 0;
   }
-
 
   doLayout(props: InlineProps): InlineState {
     return ExecutionEnvironment.canUseDOM
@@ -247,8 +244,25 @@ export class GridInline extends Component<InlineDefaultProps, InlineProps, Inlin
     this.setStateIfNeeded(this.doLayout(props));
   }
 
+  scheduleUpdateLayout(props: InlineProps) {
+    this.pendingUpdateProps = props;
+
+    if (!this.requestedFrame) {
+      this.requestedFrame = raf(this.handleDrawFrame);
+    }
+  }
+
+  handleDrawFrame = () => {
+    if (this.pendingUpdateProps) {
+      this.updateLayout(this.pendingUpdateProps);
+    }
+
+    this.pendingUpdateProps = null;
+    this.requestedFrame = null;
+  };
+
   handleItemResize = () => {
-    this.updateLayout(this.props);
+    this.scheduleUpdateLayout(this.props);
   };
 
   handleItemMounted = (item: GridItem) => {
@@ -262,11 +276,6 @@ export class GridInline extends Component<InlineDefaultProps, InlineProps, Inlin
 
     if (this.items.hasOwnProperty(key)) {
       delete this.items[key];
-    }
-
-    if (this.imgLoad.hasOwnProperty(key)) {
-      this.imgLoad[key].off('always');
-      delete this.imgLoad[key];
     }
   }
 

@@ -1,3 +1,4 @@
+/* eslint-disable */
 /* eslint-disable react/prop-types */
 import React, { Component } from "react";
 import StackGrid, { transitions, easings } from "../../../src/";
@@ -40,7 +41,7 @@ export default class Home extends Component {
     const height = Math.floor(Math.random() * (300 - 80) + 80);
     const modifier = itemModifier[Math.floor(Math.random() * itemModifier.length)];
 
-    return { id, height, modifier };
+    return { id, height, modifier, clicked: false };
   }
 
   shuffleItems = () => {
@@ -86,6 +87,16 @@ export default class Home extends Component {
       items: this.state.items.filter(o => o.id !== id)
     });
   }
+
+  toggleItemHeight = id => {
+    this.setState({
+      items: this.state.items.map(o => o.id !== id ? o : {
+        ...o,
+        height: o.clicked ? o.height / 2 : o.height * 2,
+        clicked: !o.clicked,
+      }),
+    });
+  };
 
   handleDurationChange = duration => {
     this.setState({ duration });
@@ -155,7 +166,7 @@ export default class Home extends Component {
               key={item.id}
               className={`item item--${item.modifier}`}
               style={{ height: item.height }}
-              onClick={() => this.removeItem(item.id)}
+              onClick={() => this.toggleItemHeight(item.id)}
             />
           )}
         </StackGrid>
