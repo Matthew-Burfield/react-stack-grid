@@ -1,8 +1,12 @@
 // @flow
 // eslint-disable-next-line arrow-parens
-const createArray = <T>(v: T, l: number): T[] => {
+const createArray = <T>(value: T, length: number): T[] => {
   const array = [];
-  for (let i = 0; i < l; i += 1) array.push(v);
+
+  for (let i = 0; i < length; i += 1) {
+    array.push(value);
+  }
+
   return array;
 };
 
